@@ -1,6 +1,5 @@
 import { Client, APIErrorCode, ClientErrorCode, isNotionClientError } from "@notionhq/client";
 require('polyfill-object.fromentries');
-// require('./polyfills');
 
 export async function addReleaseNotes(
     databaseId: string,
