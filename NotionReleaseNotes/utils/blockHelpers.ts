@@ -1,5 +1,3 @@
-import * as not from "@notionhq/client";
-
 export async function heading_1(content: string, url?: string): Promise<any> {
     return {
         object: 'block',

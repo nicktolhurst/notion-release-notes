@@ -92,7 +92,7 @@ export async function updateReleaseDatabase(
 }
 
 
-export function getReleaseNotesDatabaseProperties(releaseDate: string, projectName: string, buildId: string, buildUrl: string, pullrequest: PullRequest, prName?: string, prUrl?: string, ownerEmail?: string) {
+export function getReleaseNotesDatabaseProperties(releaseDate: string, projectName: string, buildId: string, buildUrl: string, pullrequest: PullRequest) {
     return {
         "Date": {
             date: {
@@ -117,22 +117,13 @@ export function getReleaseNotesDatabaseProperties(releaseDate: string, projectNa
             ]
         },
         "Name": {
-            title: [{ text: { content: prName ?? "UNDEFINED" } }],
+            title: [{ text: { content: pullrequest.title! } }],
         },
         "PR Url": {
-            url: prUrl ?? "UNDEFINED"
+            url: pullrequest.uri!
         },
         "Owner": {
-            email: ownerEmail ?? "UNDEFINED"
-        },
-        "Release Notes": {
-            rich_text: [
-                {
-                    text: {
-                        content: JSON.stringify(pullrequest),
-                    }
-                }
-            ]
-        },
+            email: pullrequest.owner!.email!
+        }
     }
 }

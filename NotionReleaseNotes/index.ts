@@ -2,7 +2,6 @@ import * as notion from "./lib/notionService";
 import * as ado from "./lib/azureDevOpsService";
 import * as utils from "./utils/common";
 import * as tl from "azure-pipelines-task-lib/task";
-import { utimesSync } from "fs";
 require('polyfill-object.fromentries');
 
 async function run(): Promise<number> {
@@ -27,9 +26,6 @@ async function run(): Promise<number> {
                 await utils.getVariable("buildId","BUILD_BUILDID"),
                 await utils.getVariable("buildUrl","SYSTEM_TEAMFOUNDATIONSERVERURI"),
                 pullRequest,
-                pullRequest.title,
-                pullRequest.uri,
-                pullRequest.owner?.name,
             );
 
             // Update Release Notes
