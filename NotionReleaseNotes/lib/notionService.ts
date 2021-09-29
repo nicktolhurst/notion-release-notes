@@ -1,7 +1,7 @@
 import { Client, APIErrorCode, ClientErrorCode, isNotionClientError } from "@notionhq/client";
 import { PullRequest } from "./azureDevOpsService"
-import * as utils from "../utils/common";
 import * as block from "../utils/blockHelpers";
+import * as utils from "../utils/common";
 
 import tl = require("azure-pipelines-task-lib/task");
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -13,7 +13,7 @@ export async function getClient(notionToken: string): Promise<Client> {
         resolve(new Client({
             auth: process.env.NOTION_TOKEN ?? notionToken,
         }));
-    }).catch((err)=>{
+    }).catch((err) => {
         throw new Error(err);
     });
 }
@@ -35,32 +35,35 @@ export async function updateReleaseDatabase(
                 tl.setResult(tl.TaskResult.Failed, err.message);
                 reject(err);
             }) as CreatePageResponse;
+            console.log("Created PR entry!");
 
             await notionClient.blocks.children.append({
                 block_id: createEntryResult.id,
                 children: [
-                    // Page Title
-                    await block.heading_1(pullRequest.title!, pullRequest.uri!),
+                    // Page Title with URL.
+                    ...[
+                        await block.heading_1(pullRequest.title!, pullRequest.uri!),
+                    ],
 
-                    // Reviewers Section
-                    await block.heading_3("Reviewers"),
-                    await block.bullet_list(pullRequest.reviewers?.map(x => x.name!)!),
+                    // List reviewers as a billet point list with a heading.
+                    ...[
+                        await block.heading_3("Reviewers"),
+                        await block.bullet_list(pullRequest.reviewers?.map(x => x.name!)!),
+                    ],
 
-                    // Commits Section - use spread operator for conditional objects.
-                    ...(pullRequest.commits != undefined 
-                        ? await block.heading_3("Commits") 
-                        : []),
-                    ...(pullRequest.commits != undefined 
-                        ? await block.bullet_list(pullRequest.commits?.map(x => `${x.id} -- ${x.comment}`)!) 
-                        : []),
+                    // Conditionally add commits if they exist!
+                    ...(pullRequest.commits != undefined ? [
+                            await block.heading_3("Commits"),
+                            await block.bullet_list(pullRequest.commits?.map(x => `${x.id} -- ${x.comment}`)!)
+                        ] : []
+                    ),
 
-                    // Commits Section
-                    await block.heading_3("Random GIF!"),
-                    await block.external_image(await utils.getGif()),
+                    // Add a gif! Just for fun.
+                    ...[
+                        await block.heading_3("Random GIF!"),
+                        await block.external_image(await utils.getGif()),
+                    ]
                 ]
-            }).catch((err) => {
-                tl.setResult(tl.TaskResult.Failed, err.message);
-                reject(err);
             });
 
             console.log(`Relase Notes: ${createEntryResult.url}`);
@@ -83,6 +86,7 @@ export async function updateReleaseDatabase(
                         tl.setResult(tl.TaskResult.Failed, err.message);
                         break
                     default:
+                        console.log("The dreaded error... ");
                         tl.setResult(tl.TaskResult.Failed, err.message);
                 }
             }
@@ -117,13 +121,13 @@ export function getReleaseNotesDatabaseProperties(releaseDate: string, projectNa
             ]
         },
         "Name": {
-            title: [{ text: { content: pullrequest.title! } }],
+            title: [{ text: { content: pullrequest.title!, link: { url: pullrequest.uri! } } }],
         },
         "PR Url": {
-            url: pullrequest.uri!
+            url: pullrequest.uri ?? "huh!"
         },
         "Owner": {
-            email: pullrequest.owner!.email!
+            email: pullrequest.owner!.name!
         }
     }
 }

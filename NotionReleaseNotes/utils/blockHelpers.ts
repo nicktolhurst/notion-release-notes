@@ -1,5 +1,5 @@
 export async function heading_1(content: string, url?: string): Promise<any> {
-    return {
+    const obj = {
         object: 'block',
         type: 'heading_1',
         heading_1: {
@@ -7,17 +7,21 @@ export async function heading_1(content: string, url?: string): Promise<any> {
                 {
                     type: 'text',
                     text: {
-                        content: content,
-                        ...(url != undefined ? { link: url } : {})
+                        ...{ content: content },
+                        ...(url != undefined ? { link: {url:url} } : {})
                     }
                 }
             ]
         }
     }
+
+    console.log(`Sucesfully added object: ${obj.type}`);
+
+    return obj;
 }
 
 export async function heading_2(content: string, url?: string): Promise<any> {
-    return {
+    var obj = {
         object: 'block',
         type: 'heading_2',
         heading_2: {
@@ -25,17 +29,21 @@ export async function heading_2(content: string, url?: string): Promise<any> {
                 {
                     type: 'text',
                     text: {
-                        content: content,
-                        ...(url != undefined ? { link: url } : {})
-                    }
-                }
+                        ...{ content: content },
+                        ...(url != undefined ? { link: {url:url} } : {})
+                    },
+                },
             ]
         }
     }
+
+    console.log(`Sucesfully added object: ${obj.type}`);
+
+    return obj;
 }
 
 export async function heading_3(content: string, url?: string): Promise<any> {
-    return {
+    var obj = {
         object: 'block',
         type: 'heading_3',
         heading_3: {
@@ -43,28 +51,36 @@ export async function heading_3(content: string, url?: string): Promise<any> {
                 {
                     type: 'text',
                     text: {
-                        content: content,
-                        ...(url != undefined ? { link: url } : {})
+                        ...{ content: content },
+                        ...(url != undefined ? { link: {url:url} } : {})
                     }
                 }
             ]
         }
     }
+
+    console.log(`Sucesfully added object: ${obj.type}`);
+
+    return obj;
 }
 
 export async function bullet_list(content: string[]): Promise<any> {
-    return {
+    var obj = {
         object: 'block',
         type: 'bulleted_list_item',
         bulleted_list_item: {
             text: content.map((obj) => { return { text: { content: obj } } })
         }
     }
+
+    console.log(`Sucesfully added object: ${obj.type}`);
+
+    return obj;
 }
 
 
 export async function external_image(url: string, caption?: string): Promise<any> {
-    return {
+    var obj = {
         object: 'block',
         type: 'image',
         image: {
@@ -72,16 +88,20 @@ export async function external_image(url: string, caption?: string): Promise<any
                 url: url
             },
             type: "external",
-            caption: caption != undefined ? [ 
+            caption: caption != undefined ? [
                 {
                     type: 'text',
                     text: {
-                      content: caption,
+                        content: caption,
                     },
-                } 
+                }
             ] : []
         }
     }
+
+    console.log(`Sucesfully added object: ${obj.type}`);
+
+    return obj;
 }
 
 
