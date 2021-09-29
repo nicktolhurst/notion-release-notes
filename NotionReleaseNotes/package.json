@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "task": "tsc && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "@notionhq/client": "^0.4.0",
+    "azure-devops-node-api": "^11.0.1",
     "azure-pipelines-task-lib": "^3.1.9",
     "polyfill-object.fromentries": "^1.0.1",
+    "random-gif-api": "^1.0.4",
     "vss-web-extension-sdk": "^5.141.0"
   },
   "devDependencies": {

@@ -1,50 +1,54 @@
-import { addReleaseNotes } from "./notionService";
-import tl = require("azure-pipelines-task-lib/task");
+import * as notion from "./lib/notionService";
+import * as ado from "./lib/azureDevOpsService";
+import * as utils from "./utils/common";
+import * as tl from "azure-pipelines-task-lib/task";
+import { utimesSync } from "fs";
 require('polyfill-object.fromentries');
 
-async function run(): Promise<number>  {
+async function run(): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
         try {
-            // Notion client configuration.
-            const databaseId = tl.getInput("databaseId") ?? process.env.NOTION_DB_ID;
-            const notionToken = tl.getInput("notionToken") ?? process.env.NOTION_API_TOKEN;
+            // Create a Notion API Client
+            const notionToken = await utils.getVariable("notionToken","NOTION_API_TOKEN");
+            const notionClient = await notion.getClient(notionToken);
 
-            if (databaseId == undefined){
-                reject("The variable 'databaseId' was null. If running locally please set the NOTION_DB_ID environment variable.")
-                return resolve(1);
-            }
+            // Create an Azure DevOps API Client
+            const adoToken = await utils.getVariable("adoToken","SYSTEM_ACCESSTOKEN","AZURE_PERSONAL_ACCESS_TOKEN");
+            const orgUrl = await utils.getVariable("adoOrgUrl","SYSTEM_COLLECTIONURI","AZURE_DEVOPS_URI");
+            const adoClient = await ado.getClient(adoToken, orgUrl);
+            
+            // Get Git information from Azure DevOps.
+            const pullRequest = await ado.getPullRequest(adoClient);
 
-            if (notionToken == undefined){
-                reject("The variable 'notionToken' was null. If running locally please set the NOTION_API_TOKEN environment variable.")
-                return resolve(1);
-            }
+            // Create Release Notes Model
+            const releaseNotes = notion.getReleaseNotesDatabaseProperties(
+                new Date().toISOString(),
+                await utils.getVariable("projectName","SYSTEM_TEAMPROJECT"),
+                await utils.getVariable("buildId","BUILD_BUILDID"),
+                await utils.getVariable("buildUrl","SYSTEM_TEAMFOUNDATIONSERVERURI"),
+                pullRequest,
+                pullRequest.title,
+                pullRequest.uri,
+                pullRequest.owner?.name,
+            );
 
-            // Get release notes from task inputs. 
-            const releaseNotes = {
-                releaseDate: tl.getInput("releaseDate") ?? new Date().toISOString(),
-                projectName: tl.getInput("projectName") ?? "test",
-                buildId: tl.getInput("buildId") ?? "test",
-                buildUrl: tl.getInput("buildUrl") ?? "http://test.com",
-                prName: tl.getInput("prName") ?? "test",
-                prUrl: tl.getInput("prUrl") ?? "http://test.com",
-                ownerEmail: tl.getInput("ownerEmail") ?? "nick@example.com",
-                releaseNotesUrl: tl.getInput("releaseNotesUrl") ?? "http://test.com",
-            }
-
-            // Add release notes.
-            await addReleaseNotes(databaseId, notionToken, releaseNotes).then((result) => {
-                resolve (result);
-            }).catch((err) => {
+            // Update Release Notes
+            const databaseId = await utils.getVariable("databaseId", "NOTION_DB_ID");
+            await notion.updateReleaseDatabase(notionClient, databaseId, releaseNotes, pullRequest).then((result) => {
+                console.log("Completed task: 'addReleaseNotes'.");
+                resolve(result);
+            }).catch((err: any) => {
+                tl.setResult(tl.TaskResult.Failed, err.message);
                 reject(err);
             });
 
-        } catch (err) {
-
-            // TODO: Log errors to agent
-            // agentApi.logError(err);
+            resolve(0);
+        } catch (err: any) {
             reject(err);
         }
-        return resolve (0);
+    }).catch((err) => {
+        tl.setResult(tl.TaskResult.Failed, err.message);
+        return 1;
     });
 }
 

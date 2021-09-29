@@ -28,4 +28,10 @@ tsc -p "${PSScriptRoot}\NotionReleaseNotes\tsconfig.json"
 tfx extension create --manifest-globs "${PSScriptRoot}\vss-extension.json"
 
 # Publish
-tfx extension publish --manifest-globs "${PSScriptRoot}\vss-extension.json" --share-with nictolhurst --token (Read-Host -Prompt "Enter PAT token..")
+$pat = $env:TASK_DEPLOY_PAT_TOKEN
+
+if (!$pat)
+{
+    $pat = Read-Host -Prompt "Enter PAT token.."
+}
+tfx extension publish --manifest-globs "${PSScriptRoot}\vss-extension.json" --share-with nictolhurst --token $pat
