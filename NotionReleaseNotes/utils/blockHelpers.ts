@@ -108,3 +108,21 @@ export async function external_image(url: string, caption?: string): Promise<any
 
     return [obj];
 }
+
+export async function paragraph(content: string): Promise<any[]> {
+    var obj = {
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+            text: [
+                {
+                    text: {
+                        content: content
+                    }
+                }
+            ]
+        }
+    }
+
+return [obj];
+}

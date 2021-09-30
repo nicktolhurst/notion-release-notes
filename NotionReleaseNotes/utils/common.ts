@@ -3,7 +3,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 export async function getGif(): Promise<string> {
     var giphy = require('giphy-api')('x8Y3tV1x3iIBC3DKhtW2VWYyfhznRQc6');
 
-    return new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>(async (resolve) => {
         const result = await giphy.random({
             tag: 'funny',
             rating: 'g',

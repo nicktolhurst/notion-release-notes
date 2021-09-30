@@ -1,7 +1,7 @@
 import { Client } from "@notionhq/client";
 import { ReleaseNotes } from "./interfaces";
 import { getVariable, getGif } from "../utils/common";
-import { heading_1, heading_3, external_image, bullet_list } from "../utils/blockHelpers";
+import { heading_1, heading_3, external_image, bullet_list, paragraph } from "../utils/blockHelpers";
 import { AppendBlockChildrenResponse, CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
 require('polyfill-object.fromentries');
 
@@ -68,24 +68,25 @@ export class NotionService {
             try {
 
                 const mainHeading = await heading_1(releaseNotesDomainModel.pullRequest?.title?.text!, releaseNotesDomainModel.pullRequest?.uri?.text!);
+                const description = await paragraph(releaseNotesDomainModel.pullRequest?.description?.text!);
                 const reviewersHeading = await heading_3("Reviewers");
                 const reviewersList = await bullet_list(releaseNotesDomainModel.pullRequest?.reviewers?.map(c => c.name!)!);
                 const commitsHeading = await heading_3("Commits");
-                const commitsList = await bullet_list(releaseNotesDomainModel.pullRequest?.commits?.map(c => `${c.id} -- ${c.comment}`)!);
+                const commitsList = await bullet_list(releaseNotesDomainModel.pullRequest?.commits?.map(c => `${c.sha} -- ${c.comment}`)!);
                 const gifHeading = await heading_3("Random GIF!");
                 const gifImage = await external_image(await getGif());
-
 
                 const appendBlockChildrenResponse = await this.#client!.blocks.children.append({
                     block_id: createEntryResult.id,
                     children: [
                         ...mainHeading,
+                        ...description,
                         ...reviewersHeading,
                         ...reviewersList,
                         ...commitsHeading,
                         ...commitsList,
                         ...gifHeading,
-                        ...gifImage
+                        ...gifImage,
                     ]
                 });
 
@@ -107,69 +108,3 @@ export class NotionService {
         });
     }
 }
-
-
-
-
-
-// export async function updateReleaseDatabase(
-//     notionClient: Client,
-//     releaseNotes: {},
-//     pullRequest: PullRequest): Promise<number> {
-
-//     return new Promise<number>(async (resolve, reject) => {
-
-//         try {
-//             // Create the enetry in the database (Notion Table).
-//             const databaseId = await utils.getVariable("databaseId", "NOTION_DB_ID");
-
-
-
-//             const mainHeading = await block.heading_1(pullRequest.title!, pullRequest.uri!);
-//             const reviewersHeading = await block.heading_3("Reviewers");
-//             const reviewersList = await block.bullet_list(pullRequest.reviewers?.map(c => c.name!)!);
-//             const commitsHeading = await block.heading_3("Commits");
-//             const commitsList = await block.bullet_list(pullRequest.commits?.map(c => `${c.id} -- ${c.comment}`)!);
-//             const gifHeading = await block.heading_3("Random GIF!");
-//             const gifImage = await block.external_image(await utils.getGif());
-
-//             const blockChildren = ;
-
-//             await notionClient.blocks.children.append({
-//                 block_id: createEntryResult.id,
-//                 children: blockChildren
-//             });
-
-//             console.log(`Relase Notes: ${createEntryResult.url}`);
-
-//             resolve(0);
-
-//         } catch (err: unknown) {
-
-//             // Handle errors and reject.
-//             if (isNotionClientError(err)) {
-//                 // error is now strongly typed to NotionClientError
-//                 switch (err.code) {
-//                     case ClientErrorCode.RequestTimeout:
-//                         reject(err);
-//                         break
-//                     case APIErrorCode.ObjectNotFound:
-//                         reject(err);
-//                         break
-//                     case APIErrorCode.Unauthorized:
-//                         reject(err);
-//                         break
-//                     default:
-//                         reject(err);
-//                         console.log("The dreaded error... ");
-//                 }
-//             }
-
-//         };
-//     });
-// }
-
-
-// export function getReleaseNotesDatabaseProperties(releaseDate: string, projectName: string, buildId: string, buildUrl: string, pullrequest: PullRequest) {
-//     return
-// }
