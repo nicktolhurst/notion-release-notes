@@ -1,4 +1,4 @@
-export async function heading_1(content: string, url?: string): Promise<any> {
+export async function heading_1(content: string, url?: string): Promise<any[]> {
     const obj = {
         object: 'block',
         type: 'heading_1',
@@ -8,7 +8,7 @@ export async function heading_1(content: string, url?: string): Promise<any> {
                     type: 'text',
                     text: {
                         ...{ content: content },
-                        ...(url != undefined ? { link: {url:url} } : {})
+                        ...(url != undefined ? { link: { url: url } } : {})
                     }
                 }
             ]
@@ -17,10 +17,10 @@ export async function heading_1(content: string, url?: string): Promise<any> {
 
     console.log(`Sucesfully added object: ${obj.type}`);
 
-    return obj;
+    return [obj];
 }
 
-export async function heading_2(content: string, url?: string): Promise<any> {
+export async function heading_2(content: string, url?: string): Promise<any[]> {
     var obj = {
         object: 'block',
         type: 'heading_2',
@@ -30,7 +30,7 @@ export async function heading_2(content: string, url?: string): Promise<any> {
                     type: 'text',
                     text: {
                         ...{ content: content },
-                        ...(url != undefined ? { link: {url:url} } : {})
+                        ...(url != undefined ? { link: { url: url } } : {})
                     },
                 },
             ]
@@ -39,10 +39,10 @@ export async function heading_2(content: string, url?: string): Promise<any> {
 
     console.log(`Sucesfully added object: ${obj.type}`);
 
-    return obj;
+    return [obj];
 }
 
-export async function heading_3(content: string, url?: string): Promise<any> {
+export async function heading_3(content: string, url?: string): Promise<any[]> {
     var obj = {
         object: 'block',
         type: 'heading_3',
@@ -52,7 +52,7 @@ export async function heading_3(content: string, url?: string): Promise<any> {
                     type: 'text',
                     text: {
                         ...{ content: content },
-                        ...(url != undefined ? { link: {url:url} } : {})
+                        ...(url != undefined ? { link: { url: url } } : {})
                     }
                 }
             ]
@@ -61,25 +61,30 @@ export async function heading_3(content: string, url?: string): Promise<any> {
 
     console.log(`Sucesfully added object: ${obj.type}`);
 
-    return obj;
+    return [obj];
 }
 
-export async function bullet_list(content: string[]): Promise<any> {
-    var obj = {
-        object: 'block',
-        type: 'bulleted_list_item',
-        bulleted_list_item: {
-            text: content.map((obj) => { return { text: { content: obj } } })
+export async function bullet_list(content: string[]): Promise<any[]> {
+    var obj: any[] = content.map(function (c) {
+        return {
+            object: 'block',
+            type: 'bulleted_list_item',
+            bulleted_list_item: {
+                text: [
+                    {
+                        text: {
+                            content: c,
+                        }
+                    }
+                ]
+            }
         }
-    }
-
-    console.log(`Sucesfully added object: ${obj.type}`);
+    });
 
     return obj;
 }
 
-
-export async function external_image(url: string, caption?: string): Promise<any> {
+export async function external_image(url: string, caption?: string): Promise<any[]> {
     var obj = {
         object: 'block',
         type: 'image',
@@ -101,10 +106,5 @@ export async function external_image(url: string, caption?: string): Promise<any
 
     console.log(`Sucesfully added object: ${obj.type}`);
 
-    return obj;
+    return [obj];
 }
-
-
-
-
-

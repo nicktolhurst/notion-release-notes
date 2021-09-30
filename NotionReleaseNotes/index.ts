@@ -7,16 +7,11 @@ require('polyfill-object.fromentries');
 async function run(): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
         try {
-            // Create a Notion API Client
-            const notionToken = await utils.getVariable("notionToken","NOTION_API_TOKEN");
-            const notionClient = await notion.getClient(notionToken);
-
-            // Create an Azure DevOps API Client
-            const adoToken = await utils.getVariable("adoToken","SYSTEM_ACCESSTOKEN","AZURE_PERSONAL_ACCESS_TOKEN");
-            const orgUrl = await utils.getVariable("adoOrgUrl","SYSTEM_COLLECTIONURI","AZURE_DEVOPS_URI");
-            const adoClient = await ado.getClient(adoToken, orgUrl);
+            // Create API clients.
+            const notionClient = await notion.getClient();
+            const adoClient = await ado.getClient();
             
-            // Get Git information from Azure DevOps.
+            // Get PR pertaining to this release.
             const pullRequest = await ado.getPullRequest(adoClient);
 
             // Create Release Notes Model
@@ -29,12 +24,9 @@ async function run(): Promise<number> {
             );
 
             // Update Release Notes
-            const databaseId = await utils.getVariable("databaseId", "NOTION_DB_ID");
-            await notion.updateReleaseDatabase(notionClient, databaseId, releaseNotes, pullRequest).then((result) => {
-                console.log("Completed task: 'addReleaseNotes'.");
+            await notion.updateReleaseDatabase(notionClient, releaseNotes, pullRequest).then((result) => {
                 resolve(result);
             }).catch((err: any) => {
-                tl.setResult(tl.TaskResult.Failed, err.message);
                 reject(err);
             });
 

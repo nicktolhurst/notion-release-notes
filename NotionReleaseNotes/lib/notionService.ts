@@ -8,10 +8,10 @@ import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
 
 require('polyfill-object.fromentries');
 
-export async function getClient(notionToken: string): Promise<Client> {
-    return new Promise<Client>(async (resolve, reject) => {
+export async function getClient(): Promise<Client> {
+    return new Promise<Client>(async (resolve) => {
         resolve(new Client({
-            auth: process.env.NOTION_TOKEN ?? notionToken,
+            auth: await utils.getVariable("notionToken","NOTION_API_TOKEN"),
         }));
     }).catch((err) => {
         throw new Error(err);
@@ -20,7 +20,6 @@ export async function getClient(notionToken: string): Promise<Client> {
 
 export async function updateReleaseDatabase(
     notionClient: Client,
-    databaseId: string,
     releaseNotes: {},
     pullRequest: PullRequest): Promise<number> {
 
@@ -28,42 +27,36 @@ export async function updateReleaseDatabase(
 
         try {
             // Create the enetry in the database (Notion Table).
+            const databaseId = await utils.getVariable("databaseId", "NOTION_DB_ID");
+
             const createEntryResult: CreatePageResponse = await notionClient.pages.create({
                 parent: { database_id: databaseId },
                 properties: releaseNotes
             }).catch((err) => {
-                tl.setResult(tl.TaskResult.Failed, err.message);
                 reject(err);
             }) as CreatePageResponse;
-            console.log("Created PR entry!");
+
+            const mainHeading = await block.heading_1(pullRequest.title!, pullRequest.uri!);
+            const reviewersHeading = await block.heading_3("Reviewers");
+            const reviewersList = await block.bullet_list(pullRequest.reviewers?.map(c => c.name!)!);
+            const commitsHeading = await block.heading_3("Commits");
+            const commitsList =  await block.bullet_list(pullRequest.commits?.map(c => `${c.id} -- ${c.comment}`)!);
+            const gifHeading = await block.heading_3("Random GIF!");
+            const gifImage = await block.external_image(await utils.getGif());
+
+            const blockChildren = [
+                ...mainHeading,
+                ...reviewersHeading,
+                ...reviewersList,
+                ...commitsHeading,
+                ...commitsList,
+                ...gifHeading,
+                ...gifImage
+            ];
 
             await notionClient.blocks.children.append({
                 block_id: createEntryResult.id,
-                children: [
-                    // Page Title with URL.
-                    ...[
-                        await block.heading_1(pullRequest.title!, pullRequest.uri!),
-                    ],
-
-                    // List reviewers as a billet point list with a heading.
-                    ...[
-                        await block.heading_3("Reviewers"),
-                        await block.bullet_list(pullRequest.reviewers?.map(x => x.name!)!),
-                    ],
-
-                    // Conditionally add commits if they exist!
-                    ...(pullRequest.commits != undefined ? [
-                            await block.heading_3("Commits"),
-                            await block.bullet_list(pullRequest.commits?.map(x => `${x.id} -- ${x.comment}`)!)
-                        ] : []
-                    ),
-
-                    // Add a gif! Just for fun.
-                    ...[
-                        await block.heading_3("Random GIF!"),
-                        await block.external_image(await utils.getGif()),
-                    ]
-                ]
+                children: blockChildren
             });
 
             console.log(`Relase Notes: ${createEntryResult.url}`);
@@ -77,20 +70,20 @@ export async function updateReleaseDatabase(
                 // error is now strongly typed to NotionClientError
                 switch (err.code) {
                     case ClientErrorCode.RequestTimeout:
-                        tl.setResult(tl.TaskResult.Failed, err.message);
+                        reject(err);
                         break
                     case APIErrorCode.ObjectNotFound:
-                        tl.setResult(tl.TaskResult.Failed, err.message);
+                        reject(err);
                         break
                     case APIErrorCode.Unauthorized:
-                        tl.setResult(tl.TaskResult.Failed, err.message);
+                        reject(err);
                         break
                     default:
+                        reject(err);
                         console.log("The dreaded error... ");
-                        tl.setResult(tl.TaskResult.Failed, err.message);
                 }
             }
-            reject(err);
+
         };
     });
 }
@@ -122,9 +115,6 @@ export function getReleaseNotesDatabaseProperties(releaseDate: string, projectNa
         },
         "Name": {
             title: [{ text: { content: pullrequest.title!, link: { url: pullrequest.uri! } } }],
-        },
-        "PR Url": {
-            url: pullrequest.uri ?? "huh!"
         },
         "Owner": {
             email: pullrequest.owner!.name!

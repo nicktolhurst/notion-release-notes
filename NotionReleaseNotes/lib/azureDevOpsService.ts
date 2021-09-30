@@ -5,68 +5,38 @@ import * as utils from "../utils/common";
 require('polyfill-object.fromentries');
 
 import tl = require("azure-pipelines-task-lib/task");
+import { cp } from "fs";
+import { VersionControlChangeType } from "azure-devops-node-api/interfaces/TfvcInterfaces";
 
-export interface Reviewer {
-    name?: string,
-    email?: string,
-    isRequired?: boolean
-}
+export async function getClient(): Promise<azdev.WebApi> {
+    return new Promise<azdev.WebApi>(async (resolve) => {
+        const adoToken = await utils.getVariable(undefined, "SYSTEM_ACCESSTOKEN", "AZURE_PERSONAL_ACCESS_TOKEN");
+        const orgUrl = await utils.getVariable(undefined, "SYSTEM_COLLECTIONURI", "AZURE_DEVOPS_URI");
 
-export interface Owner {
-    name?: string,
-    email?: string,
-}
+        const client = new azdev.WebApi(orgUrl, azdev.getPersonalAccessTokenHandler(adoToken));
 
-export interface Committer {
-    name?: string,
-    email?: string,
-}
-
-export interface Commit {
-    id: string | undefined,
-    comment: string | undefined,
-    committer?: Committer
-}
-
-export interface ReleaseNotes {
-    pullRequests: {
-        id?: number,
-        uri?: string,
-        title?: string,
-        reviewers?: Reviewer[],
-        createdBy?: Owner,
-    },
-    commits: Commit[] | undefined
-}
-
-export interface PullRequest {
-    title?: string
-    reviewers?: Reviewer[]
-    commits?: Commit[],
-    owner?: Owner,
-    uri?: string,
-}
-
-export async function getClient(adoToken: string, orgUrl: string): Promise<azdev.WebApi> {
-    return new Promise<azdev.WebApi>(async (resolve, reject) => {
-        resolve(new azdev.WebApi(orgUrl, azdev.getPersonalAccessTokenHandler(adoToken)));
+        resolve(client);
     }).catch((err) => {
-        throw new Error(err);
+        throw new Error("Error creating Azure DevOps Client. Error Message: " + err.message);
     });
 }
 
 export async function getPullRequest(client: azdev.WebApi): Promise<PullRequest> {
     return new Promise<PullRequest>(async (resolve, reject) => {
         try {
-            console.log("Finding PR...");
             const gitApi = await client.getGitApi();
             const pullRequestId = parseInt(await utils.getVariable(undefined, "SYSTEM_PULLREQUEST_PULLREQUESTID"));
             const pullRequest = await gitApi.getPullRequestById(pullRequestId);
-            console.log(`> Found PR: '${pullRequest.title}'`);
+            const reviewers = getReviewers(pullRequest);
+            const commits = await getCommits(client, pullRequest);
+
             resolve({
                 title: pullRequest.title,
-                reviewers: getReviewers(pullRequest),
-                commits: await getCommits(client, pullRequest),
+                description: pullRequest.description,
+                reviewers: reviewers,
+                commits: commits,
+                labels: pullRequest.labels?.map(label => label.name!),
+                branchName: pullRequest.sourceRefName,
                 owner: {
                     name: pullRequest.createdBy?.displayName,
                     email: pullRequest.createdBy?.uniqueName,
@@ -77,7 +47,7 @@ export async function getPullRequest(client: azdev.WebApi): Promise<PullRequest>
             reject(err);
         }
     }).catch(err => {
-        throw new Error("Could not get pull requests.")
+        throw new Error("Could not get pull requests. Error message: " + err.message)
     });
 }
 
@@ -101,14 +71,14 @@ async function getCommits(client: azdev.WebApi, pullRequest: GitPullRequest): Pr
     return new Promise<Commit[]>(async (resolve, reject) => {
         try {
             const api = await client.getGitApi();
-            console.log(api);
+
             const commits = await api.getPullRequestCommits(pullRequest.repository?.id!, pullRequest.pullRequestId!);
-            console.log(commits);
+
             if (commits == undefined) {
                 tl.logIssue(tl.IssueType.Warning, "Could not find any commits on this PR! *gasp*")
             };
 
-            resolve(commits?.map(function (obj) {
+            var object = Promise.all(commits?.map(async function (obj) {
                 return {
                     id: obj.commitId,
                     comment: obj.comment,
@@ -116,6 +86,34 @@ async function getCommits(client: azdev.WebApi, pullRequest: GitPullRequest): Pr
                         name: obj.committer?.name,
                         email: obj.committer?.email,
                     },
+                    changes: await getChanges(client, obj, pullRequest.repository?.id!)
+                }
+            }));
+
+            resolve(object);
+
+        } catch (err) {
+            reject(err);
+        }
+
+    }).catch(err => {
+        throw new Error("Could not get commits. Error message: " + err.message)
+    });
+}
+
+async function getChanges(client: azdev.WebApi, commit: GitCommitRef, repositoryId: string): Promise<ChangedFile[]> {
+    return new Promise<ChangedFile[]>(async (resolve, reject) => {
+        try {
+            const api = await client.getGitApi();
+
+            const changes = (await api.getChanges(commit.commitId!, repositoryId)).changes;
+
+            resolve(changes!.map(function (obj) {
+                return {
+                    path: obj.item?.path!,
+                    url: obj.item?.url!,
+                    type: obj.changeType!,
+                    isFolder: obj.item?.isFolder!
                 }
             }));
 
@@ -124,105 +122,58 @@ async function getCommits(client: azdev.WebApi, pullRequest: GitPullRequest): Pr
         }
 
     }).catch(err => {
-        throw new Error("Could not get pull requests.")
+        throw new Error("Could not get changes. Error message: " + err.message)
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export async function getReleaseNotes(adClient: azdev.WebApi, projectName: string, repositoryId: string, pullRequestId: number): Promise<ReleaseNotes> {
-    return new Promise<ReleaseNotes>(async (resolve, reject) => {
-        console.log("Starting task: 'getReleaseNotes'.");
-
-        try {
-            const gitApi = await adClient.getGitApi();
-
-            const commits = await gitApi.getPullRequestCommits(repositoryId, pullRequestId, projectName)
-
-            const pullRequest = await gitApi.getPullRequestById(pullRequestId);
-
-            const releaseNotes = formatReleaseNotes(commits, pullRequest);
-
-            resolve(releaseNotes);
-
-            console.log("Completed task: 'getReleaseNotes'.");
-        } catch (err) {
-
-            reject(err);
-        };
-    }).catch((err) => {
-        tl.setResult(tl.TaskResult.Failed, err.message);
-        throw new Error();
-    });
+export interface Reviewer {
+    name?: string,
+    email?: string,
+    isRequired?: boolean
 }
 
-
-function formatReleaseNotes(commits: GitCommitRef[], pullRequest: GitPullRequest): ReleaseNotes {
-    return {
-        pullRequests: {
-            id: pullRequest.pullRequestId,
-            uri: pullRequest.url,
-            title: pullRequest.title,
-            reviewers: pullRequest.reviewers?.map(function (obj) {
-                return {
-                    name: obj.displayName,
-                    email: obj.uniqueName,
-                }
-            }),
-            createdBy: {
-                name: pullRequest.createdBy?.displayName,
-                email: pullRequest.createdBy?.uniqueName,
-            }
-        },
-        commits: commits.map(function (obj) {
-            return {
-                id: obj.commitId,
-                comment: obj.comment
-            }
-        })
-    }
+export interface Owner {
+    name?: string,
+    email?: string,
 }
 
+export interface Committer {
+    name?: string,
+    email?: string,
+}
+
+export interface Commit {
+    id: string | undefined,
+    comment: string | undefined,
+    committer?: Committer,
+    changes: ChangedFile[]
+}
+
+export interface ChangedFile {
+    path: string,
+    url: string,
+    type: VersionControlChangeType,
+    isFolder: boolean
+}
+
+export interface ReleaseNotes {
+    pullRequests: {
+        id?: number,
+        uri?: string,
+        title?: string,
+        reviewers?: Reviewer[],
+        createdBy?: Owner,
+    },
+    commits: Commit[] | undefined
+}
+
+export interface PullRequest {
+    title?: string,
+    description?: string,
+    reviewers?: Reviewer[],
+    commits?: Commit[],
+    labels?: string[] | undefined,
+    branchName?: string,
+    owner?: Owner,
+    uri?: string,
+}
