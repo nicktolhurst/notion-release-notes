@@ -1,10 +1,16 @@
 import * as tl from "azure-pipelines-task-lib/task";
-const rga = require("random-gif-api");
 
 export async function getGif(): Promise<string> {
+    var giphy = require('giphy-api')('x8Y3tV1x3iIBC3DKhtW2VWYyfhznRQc6');
+
     return new Promise<string>(async (resolve, reject) => {
-        console.log(`Adding GIF to release notes!`)
-        resolve(await rga.angry())
+        const result = await giphy.random({
+            tag: 'funny',
+            rating: 'g',
+            fmt: 'gif'
+        });
+
+        resolve(result.data.image_original_url);
     }).catch((err) => {
         throw new Error("Unable to get gif :(");
     })
