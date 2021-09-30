@@ -10,7 +10,7 @@ export async function getGif(): Promise<string> {
     })
 }
 
-export async function getVariable(piplineVariable?: string, environmentVariable?: string, localEnvironmentVariable?: string) {
+export function getVariable(piplineVariable?: string, environmentVariable?: string, localEnvironmentVariable?: string) {
 
     const varFromPipelineTaskParameters 
         = piplineVariable != undefined 
