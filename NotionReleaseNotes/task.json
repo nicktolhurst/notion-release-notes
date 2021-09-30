@@ -13,7 +13,7 @@
     "version":  {
                     "Major":  0,
                     "Minor":  1,
-                    "Patch":  15
+                    "Patch":  20
                 },
     "minimumAgentVersion":  "1.82.0",
     "inputs":  [
@@ -40,6 +40,13 @@
                        "defaultValue":  "$(System.AccessToken)",
                        "required":  true,
                        "helpMarkDown":  "The pipelines system access token."
+                   },
+                   {
+                       "name":  "versionNumber",
+                       "type":  "string",
+                       "label":  "Release Version",
+                       "required":  true,
+                       "helpMarkDown":  "Release Version Number"
                    }
                ],
     "execution":  {

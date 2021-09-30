@@ -2,7 +2,7 @@
     "manifestVersion":  1,
     "id":  "notion-release-notes",
     "publisher":  "NickTolhurst",
-    "version":  "0.1.15",
+    "version":  "0.1.20",
     "name":  "Notion Release Notes",
     "description":  "A sample Visual Studio Services extension",
     "public":  false,

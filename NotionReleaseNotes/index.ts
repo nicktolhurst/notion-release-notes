@@ -3,7 +3,7 @@ import { GitCommitChanges, GitPullRequest, GitCommitRef } from "azure-devops-nod
 import { AdoObject, AdoService, AdoResponseObjectCollection } from "./lib/adoService";
 import * as tl from "azure-pipelines-task-lib/task";
 import { ReleaseNotes, CommitFileChange } from "./lib/interfaces";
-import { resolve } from "path/posix";
+import { WebApiTagDefinition } from "azure-devops-node-api/interfaces/CoreInterfaces";
 require('polyfill-object.fromentries');
 
 async function run(): Promise<number> {
@@ -15,10 +15,12 @@ async function run(): Promise<number> {
 
             const gitPullRequest = await ado.get(AdoObject.PullRequest) as GitPullRequest;
             const gitCommitRefs = await ado.get(AdoObject.CommitRefs, gitPullRequest) as GitPullRequest[];
+            const webApiTagDefinitions = await ado.get(AdoObject.PullRequestLabels, gitPullRequest) as WebApiTagDefinition[];
 
             const adoResponseObjectCollection: AdoResponseObjectCollection = {
                 gitPullRequest: gitPullRequest,
-                gitCommitRefs: gitCommitRefs
+                gitCommitRefs: gitCommitRefs,
+                webApiTagDefinitions: webApiTagDefinitions,
             }
 
             console.log(adoResponseObjectCollection);
@@ -60,7 +62,7 @@ async function mapToReleaseNotesDomainModeil(adoResponseObjectCollection: AdoRes
                         name: adoResponseObjectCollection.gitPullRequest.repository?.project?.name,
                         url: adoResponseObjectCollection.gitPullRequest.repository?.project?.url
                     },
-                    buildId: adoResponseObjectCollection.gitPullRequest.labels?.find(label => label.name?.toLowerCase().startsWith("version:"))?.name?.toLowerCase()
+                    buildId: adoResponseObjectCollection.webApiTagDefinitions.find(tag => tag.name?.toLowerCase().startsWith("version:"))?.name?.toLowerCase()
                 },
                 pullRequest: {
                     branchName: {
