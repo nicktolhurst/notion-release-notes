@@ -15,8 +15,6 @@ export async function heading_1(content: string, url?: string): Promise<any[]> {
         }
     }
 
-    console.log(`Sucesfully added object: ${obj.type}`);
-
     return [obj];
 }
 
@@ -37,8 +35,6 @@ export async function heading_2(content: string, url?: string): Promise<any[]> {
         }
     }
 
-    console.log(`Sucesfully added object: ${obj.type}`);
-
     return [obj];
 }
 
@@ -58,8 +54,6 @@ export async function heading_3(content: string, url?: string): Promise<any[]> {
             ]
         }
     }
-
-    console.log(`Sucesfully added object: ${obj.type}`);
 
     return [obj];
 }
@@ -103,8 +97,6 @@ export async function external_image(url: string, caption?: string): Promise<any
             ] : []
         }
     }
-
-    console.log(`Sucesfully added object: ${obj.type}`);
 
     return [obj];
 }

@@ -23,19 +23,19 @@ async function run(): Promise<number> {
                 webApiTagDefinitions: webApiTagDefinitions,
             }
 
-            console.log(adoResponseObjectCollection);
-
             // TODO: Implement a mapper!
             // new Mapper().map<AdoOutput, ReleaseNotes>(adoOutput);
             // Workaround for now:
             const releaseNotesDomainModel: ReleaseNotes = await mapToReleaseNotesDomainModeil(adoResponseObjectCollection, ado);
+            tl.debug(`'releaseNotesDomainModel' :> `);
+            tl.debug(`${JSON.stringify(releaseNotesDomainModel, null, 2)}`);
 
             // Create Notion API client and add release notes.
             const notion = await new NotionService().initialize();
 
             const createPageResponse = await notion.pushReleaseNotes(releaseNotesDomainModel);
 
-            const appendBlockChildrenResponse = await notion.setReleaseNotesContent(createPageResponse, releaseNotesDomainModel);
+            await notion.setReleaseNotesContent(createPageResponse, releaseNotesDomainModel);
         
             resolve(0);
         } catch (err: any) {
@@ -62,7 +62,7 @@ async function mapToReleaseNotesDomainModeil(adoResponseObjectCollection: AdoRes
                         name: adoResponseObjectCollection.gitPullRequest.repository?.project?.name,
                         url: adoResponseObjectCollection.gitPullRequest.repository?.project?.url
                     },
-                    buildId: adoResponseObjectCollection.webApiTagDefinitions.find(tag => tag.name?.toLowerCase().startsWith("version:"))?.name?.toLowerCase()
+                    buildId: adoResponseObjectCollection.webApiTagDefinitions.find(tag => tag.name?.toLowerCase().startsWith("version:"))?.name?.toLowerCase().split("version: ")[1]
                 },
                 pullRequest: {
                     branchName: {

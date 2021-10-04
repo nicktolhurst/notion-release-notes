@@ -20,7 +20,7 @@ export function getVariable(piplineVariable?: string, environmentVariable?: stri
 
     const varFromPipelineTaskParameters 
         = piplineVariable != undefined 
-            ? tl.getInput(piplineVariable) 
+            ? tl.getInput(piplineVariable, false) 
             : undefined;
 
     const varFromPipelineEnvironmentVariable 
@@ -41,7 +41,7 @@ export function getVariable(piplineVariable?: string, environmentVariable?: stri
             + `\n\t[${environmentVariable}]: '${varFromPipelineEnvironmentVariable}'`
             + `\n\t[${localEnvironmentVariable}]: '${varFromLocalEnvironmentVariable}'`);
     
-    console.log(`Found variable: ${piplineVariable ?? environmentVariable ?? localEnvironmentVariable} : ${variable}`)
-
+    tl.debug(`Sucessfully evaluated: '${varFromPipelineTaskParameters != undefined ? piplineVariable : varFromPipelineEnvironmentVariable != undefined ? environmentVariable : localEnvironmentVariable}'`);
+    
     return variable;
 }
