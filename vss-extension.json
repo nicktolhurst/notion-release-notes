@@ -5,7 +5,7 @@
     "version":  "0.1.22",
     "name":  "Notion Release Notes",
     "description":  "A sample Visual Studio Services extension",
-    "public":  false,
+    "public":  true,
     "categories":  [
                        "Azure Pipelines"
                    ],
