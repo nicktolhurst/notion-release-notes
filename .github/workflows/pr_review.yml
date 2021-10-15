@@ -17,6 +17,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
     steps:
       - uses: actions/checkout@v2
 
@@ -54,3 +56,11 @@ jobs:
         run: |
           tfx extension create --manifest-globs vss-extension.test.json
           tfx extension publish --manifest-globs vss-extension.test.json --share-with nictolhurst --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Trigger Task Run
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: |
+            az repos pr policy queue --evaluation-id 96e348ff-825d-4e85-acc5-edfd29f76776 --id 28 --org https://dev.azure.com/nictolhurst/
+            
+          
