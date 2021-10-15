@@ -87,8 +87,6 @@ export class NotionService {
                 const reviewersList = await bullet_list(releaseNotesDomainModel.pullRequest?.reviewers?.map(c => c.name!)!);
                 const commitsHeading = await heading_3("Commits");
                 const commitsList = await bullet_list(releaseNotesDomainModel.pullRequest?.commits?.map(c => `${c.sha} -- ${c.comment}`)!);
-                const gifHeading = await heading_3("Random GIF!");
-                const gifImage = await external_image(await getGif());
 
                 const appendBlockChildrenResponse = await this.#client!.blocks.children.append({
                     block_id: createEntryResult.id,
@@ -99,8 +97,6 @@ export class NotionService {
                         ...reviewersList,
                         ...commitsHeading,
                         ...commitsList,
-                        ...gifHeading,
-                        ...gifImage,
                     ]
                 });
 

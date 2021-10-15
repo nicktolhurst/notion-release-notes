@@ -8,7 +8,7 @@
     "icons":  {
                   "default":  "notion-azdo-icon.png"
               },
-    "public":  true,
+    "public":  false,
     "content":  {
                     "details":  {
                                     "path":  "overview.md"

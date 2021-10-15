@@ -1,7 +1,7 @@
 {
     "id":  "31fc17f2-be55-4d37-a5c9-8c50d47612b0",
     "name":  "NotionReleaseNotes",
-    "friendlyName":  "Notion Release Notes!",
+    "friendlyName":  "Release Notes!",
     "description":  "Adds an entry to a notion table (database object).",
     "helpMarkDown":  "Version: #{Build.BuildNumber})",
     "category":  "Utility",
@@ -13,7 +13,7 @@
     "version":  {
                     "Major":  0,
                     "Minor":  1,
-                    "Patch":  22
+                    "Patch":  33
                 },
     "minimumAgentVersion":  "1.82.0",
     "inputs":  [
