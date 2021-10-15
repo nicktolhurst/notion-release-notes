@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "notion-release-notes",
   "publisher": "NickTolhurst",
-  "version": "0.1.48",
+  "version": "0.1.49",
   "name": "Notion Release Notes",
   "description": "A solution to automate Azure DevOps release notes in Notion.",
   "icons": {
@@ -35,7 +35,7 @@
   ],
   "contributions": [
     {
-      "id": "notion-release-notes-test",
+      "id": "notion-release-notes",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"
@@ -43,10 +43,10 @@
       "properties": {
         "name": "NotionReleaseNotes"
       },
-      "iconAsset": "notion-release-notes-test.notion-release-notes-test/notion-azdo-icon.png",
+      "iconAsset": "notion-release-notes.notion-release-notes/notion-azdo-icon.png",
       "_sharedData": {
         "assets": [
-          "notion-release-notes-test.notion-release-notes-test/notion-azdo-icon.png"
+          "notion-release-notes.notion-release-notes/notion-azdo-icon.png"
         ]
       }
     }
