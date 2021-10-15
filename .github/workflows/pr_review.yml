@@ -25,20 +25,21 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      # Set the version of node.
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
           node-version: '10.x'
     
-      # Runs a single command using the runners shell
-      - name: NPM or Yarn install with caching
+      # Installs node modules & caches.
+      - name: NPM install with caching
         uses: bahmutov/npm-install@v1.6.0
         with:
           # Working directory to specify subfolder in which dependencies are defined
           working-directory: ./NotionReleaseNotes/
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      # Compiles typescript
+      - name: Compile Typescript
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          tsc -p ./NotionReleaseNotes/tsconfig.json
+
