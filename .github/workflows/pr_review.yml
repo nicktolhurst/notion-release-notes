@@ -17,8 +17,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
     steps:
       - uses: actions/checkout@v2
 
@@ -60,6 +58,8 @@ jobs:
           tfx extension publish --manifest-globs vss-extension.test.json --share-with nictolhurst --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Trigger Task Run
+        env:
+          AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
         uses: Azure/cli@1.0.4
         with:
           inlineScript: |
