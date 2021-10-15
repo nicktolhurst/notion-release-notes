@@ -34,7 +34,7 @@ jobs:
 
       - name: Update Build Version
         run: |
-          ./update-version.ps1 -SemanticReleaseType "Minor"
+          ./update-version.ps1 -SemanticReleaseType "Build"
         shell: pwsh  
 
       - name: Git Auto Commit
