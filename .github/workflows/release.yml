@@ -34,7 +34,7 @@ jobs:
 
       - name: Update Build Version
         run: |
-          ./update-version.ps1 -SemanticReleaseType "Minor"
+          ./update-version.ps1 -SemanticReleaseType "Build"
         shell: pwsh  
 
       - name: Git Auto Commit
@@ -53,4 +53,4 @@ jobs:
           AZURE_DEVOPS_EXT_PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }} 
         run: |
           tfx extension create --manifest-globs vss-extension.json
-          tfx extension publish --manifest-globs vss-extension.json --share-with nictolhurst --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          tfx extension publish --manifest-globs vss-extension.json --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
