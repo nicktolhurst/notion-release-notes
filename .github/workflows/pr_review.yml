@@ -43,3 +43,7 @@ jobs:
         run: |
           tsc -p ./NotionReleaseNotes/tsconfig.json
 
+       # Updates Versions
+      - run: |
+          ./update-version.ps1 -SemanticReleaseType "Minor"
+        shell: pwsh  
