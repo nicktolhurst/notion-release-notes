@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "notion-release-notes",
   "publisher": "NickTolhurst",
-  "version": "0.1.53",
+  "version": "0.1.54",
   "name": "Notion Release Notes",
   "description": "A solution to automate Azure DevOps release notes in Notion.",
   "icons": {
