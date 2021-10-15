@@ -53,6 +53,8 @@ jobs:
         uses: Maetis/github-action-tfxinstaller@v1.0.0-pre
 
       - name: Publish Task
+        env:
+          AZURE_DEVOPS_EXT_PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           tfx extension create --manifest-globs vss-extension.test.json
           tfx extension publish --manifest-globs vss-extension.test.json --share-with nictolhurst --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
