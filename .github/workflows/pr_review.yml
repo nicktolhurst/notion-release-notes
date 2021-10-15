@@ -44,6 +44,7 @@ jobs:
           branch: ${{ github.head_ref }}
           commit_options: --no-verify
           file_pattern: .
+          token: ${{ secrets.GITHUB_PAT }}
 
       - name: TfxInstaller
         uses: Maetis/github-action-tfxinstaller@v1.0.0-pre
