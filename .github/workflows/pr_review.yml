@@ -71,7 +71,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           message: |
-            A test has been triggered over at [Azure DevOps](https://nictolhurst.visualstudio.com/Awesome%20Project/_git/Awesome%20Project/pullrequest/29)
+            Hi @${{ github.event.pusher.name }},
+          
+            A test for your commit been triggered over at [Azure DevOps](https://nictolhurst.visualstudio.com/Awesome%20Project/_git/Awesome%20Project/pullrequest/29)
             
-            When the task has compelted, you're release notes will be available at [Notion Release Notes Tests](https://ethereal-coreopsis-b86.notion.site/3c0cf7a718e8404faa837870b25a2eef?v=28249579058948718b4ce06434256f82)
+            When the task has compelted, your release notes will be available for review at [Notion Release Notes Tests](https://ethereal-coreopsis-b86.notion.site/3c0cf7a718e8404faa837870b25a2eef?v=28249579058948718b4ce06434256f82)
+          
+            I have added you as a reviewer, please go verify your changes!
           allow-repeats: true
+          
+      - name: Request review
+        # You may pin to the exact commit or the version.
+        # uses: murs313/request-review@fb50780dbb30612d1ec19b62e4cfc5a7805855cf
+        uses: murs313/request-review@v1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          reviewers: ${{ github.event.pusher.email }}
