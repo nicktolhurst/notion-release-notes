@@ -35,7 +35,7 @@ $testManifest.version = $newVersionString
 
 Set-Content -Path "${PSScriptRoot}\NotionReleaseNotes\task.json"  -Value ($task | ConvertTo-Json -Depth 10) 
 Set-Content -Path "${PSScriptRoot}\vss-extension.json" -Value ($manifest | ConvertTo-Json -Depth 10) 
-Set-Content -Path "${PSScriptRoot}\vss-extension.test.json" -Value ($manifest | ConvertTo-Json -Depth 10) 
+Set-Content -Path "${PSScriptRoot}\vss-extension.test.json" -Value ($testManifest | ConvertTo-Json -Depth 10) 
 Set-Content -Path "${PSScriptRoot}\version.json" -Value ($version | ConvertTo-Json -Depth 10.)
 
 Write-Output "New Version: ${version}"

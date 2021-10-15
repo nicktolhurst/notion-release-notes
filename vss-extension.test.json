@@ -1,14 +1,14 @@
 {
   "manifestVersion": 1,
-  "id": "notion-release-notes",
+  "id": "notion-release-notes-qa",
   "publisher": "NickTolhurst",
-  "version": "0.1.50",
-  "name": "Notion Release Notes",
-  "description": "A solution to automate Azure DevOps release notes in Notion.",
+  "version": "0.1.49",
+  "name": "Notion Release Notes (QA)",
+  "description": "A private version of the Notion Release Notes task for qa purposes.",
   "icons": {
     "default": "notion-azdo-icon.png"
   },
-  "public": true,
+  "public": false,
   "content": {
     "details": {
       "path": "overview.md"
@@ -35,7 +35,7 @@
   ],
   "contributions": [
     {
-      "id": "notion-release-notes",
+      "id": "notion-release-notes-qa",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"
@@ -43,10 +43,10 @@
       "properties": {
         "name": "NotionReleaseNotes"
       },
-      "iconAsset": "notion-release-notes.notion-release-notes/notion-azdo-icon.png",
+      "iconAsset": "notion-release-notes-qa.notion-release-notes-qa/notion-azdo-icon.png",
       "_sharedData": {
         "assets": [
-          "notion-release-notes.notion-release-notes/notion-azdo-icon.png"
+          "notion-release-notes-qa.notion-release-notes-qa/notion-azdo-icon.png"
         ]
       }
     }
