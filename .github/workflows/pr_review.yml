@@ -71,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           message: |
-            Hi @${{ github.event.pusher.name }},
+            Hi @${{ github.actor.name }},
           
             A test for your commit been triggered over at [Azure DevOps](https://nictolhurst.visualstudio.com/Awesome%20Project/_git/Awesome%20Project/pullrequest/29)
             
@@ -86,4 +86,4 @@ jobs:
         uses: murs313/request-review@v1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          reviewers: ${{ github.event.pusher.email }}
+          reviewers: ${{ github.actor.email }}
