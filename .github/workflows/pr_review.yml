@@ -47,6 +47,9 @@ jobs:
           commit_options: --no-verify
           file_pattern: .
 
+      - name: TfxInstaller
+        uses: Maetis/github-action-tfxinstaller@v1.0.0-pre
+
       - name: Publish Task
         run: |
           tfx extension create --manifest-globs vss-extension.test.json
