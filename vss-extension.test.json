@@ -1,14 +1,14 @@
 {
   "manifestVersion": 1,
-  "id": "notion-release-notes",
+  "id": "notion-release-notes-test",
   "publisher": "NickTolhurst",
   "version": "0.1.46",
-  "name": "Notion Release Notes",
-  "description": "A sample Visual Studio Services extension",
+  "name": "Notion Release Notes (Test)",
+  "description": "A solution to automate Azure DevOps release notes in Notion.",
   "icons": {
     "default": "notion-azdo-icon.png"
   },
-  "public": true,
+  "public": false,
   "content": {
     "details": {
       "path": "overview.md"
