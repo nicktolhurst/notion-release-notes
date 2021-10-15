@@ -35,7 +35,7 @@
   ],
   "contributions": [
     {
-      "id": "notion-release-notes",
+      "id": "notion-release-notes-test",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"
@@ -43,10 +43,10 @@
       "properties": {
         "name": "NotionReleaseNotes"
       },
-      "iconAsset": "notion-release-notes.notion-release-notes/notion-azdo-icon.png",
+      "iconAsset": "notion-release-notes-test.notion-release-notes-test/notion-azdo-icon.png",
       "_sharedData": {
         "assets": [
-          "notion-release-notes.notion-release-notes/notion-azdo-icon.png"
+          "notion-release-notes-test.notion-release-notes-test/notion-azdo-icon.png"
         ]
       }
     }
