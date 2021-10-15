@@ -1,17 +1,9 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CD
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,7 +26,7 @@ jobs:
 
       - name: Update Build Version
         run: |
-          ./update-version.ps1 -SemanticReleaseType "Minor"
+          ./update-version.ps1 -SemanticReleaseType "Build"
         shell: pwsh  
 
       - name: Git Auto Commit
@@ -53,4 +45,4 @@ jobs:
           AZURE_DEVOPS_EXT_PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }} 
         run: |
           tfx extension create --manifest-globs vss-extension.json
-          tfx extension publish --manifest-globs vss-extension.json --share-with nictolhurst --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          tfx extension publish --manifest-globs vss-extension.json --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
