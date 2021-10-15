@@ -63,4 +63,12 @@ jobs:
           inlineScript: |
             az repos pr policy queue --evaluation-id 96e348ff-825d-4e85-acc5-edfd29f76776 --id 28 --org https://dev.azure.com/nictolhurst/
             
-          
+      - uses: mshick/add-pr-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          message: |
+            A test has been triggered over at [Azure DevOps](https://nictolhurst.visualstudio.com/Awesome%20Project/_git/Awesome%20Project/pullrequest/29)
+            
+            When the task has compelted, you're release notes will be available at [Notion Release Notes Tests](https://ethereal-coreopsis-b86.notion.site/3c0cf7a718e8404faa837870b25a2eef?v=28249579058948718b4ce06434256f82)
+          allow-repeats: true
