@@ -1,75 +1,75 @@
 {
-    "manifestVersion":  1,
-    "id":  "notion-release-notes",
-    "publisher":  "NickTolhurst",
-    "version":  "0.1.33",
-    "name":  "Notion Release Notes",
-    "description":  "A sample Visual Studio Services extension",
-    "icons":  {
-                  "default":  "notion-azdo-icon.png"
-              },
-    "public":  false,
-    "content":  {
-                    "details":  {
-                                    "path":  "overview.md"
-                                }
-                },
-    "categories":  [
-                       "Azure Pipelines"
-                   ],
-    "tags":  [
-                 "Extension",
-                 "Marketplace",
-                 "Continuous Integration",
-                 "Continuous Delivery",
-                 "Build",
-                 "Release",
-                 "Azure Pipelines",
-                 "Azure DevOps Extensions",
-                 "Visual Studio Extensions"
-             ],
-    "targets":  [
-                    {
-                        "id":  "Microsoft.VisualStudio.Services"
-                    }
-                ],
-    "contributions":  [
-                          {
-                              "id":  "notion-release-notes",
-                              "type":  "ms.vss-distributed-task.task",
-                              "targets":  [
-                                              "ms.vss-distributed-task.tasks"
-                                          ],
-                              "properties":  {
-                                                 "name":  "NotionReleaseNotes"
-                                             },
-                              "iconAsset":  "notion-release-notes.notion-release-notes/notion-azdo-icon.png",
-                              "_sharedData":  {
-                                                  "assets":  [
-                                                                 "notion-release-notes.notion-release-notes/notion-azdo-icon.png"
-                                                             ]
-                                              }
-                          }
-                      ],
-    "files":  [
-                  {
-                      "path":  "NotionReleaseNotes/node_modules/vss-web-extension-sdk/lib",
-                      "addressable":  true,
-                      "packagePath":  "lib"
-                  },
-                  {
-                      "path":  "NotionReleaseNotes"
-                  },
-                  {
-                      "path":  "notion-release-notes.png"
-                  },
-                  {
-                      "path":  "notion-azdo-icon.png",
-                      "addressable":  true
-                  }
-              ],
-    "scopes":  [
-                   "vso.build_execute",
-                   "vso.serviceendpoint_manage"
-               ]
+  "manifestVersion": 1,
+  "id": "notion-release-notes-qa",
+  "publisher": "NickTolhurst",
+  "version": "0.1.60",
+  "name": "Notion Release Notes (QA)",
+  "description": "A private version of the Notion Release Notes task for qa purposes.",
+  "icons": {
+    "default": "notion-azdo-icon.png"
+  },
+  "public": false,
+  "content": {
+    "details": {
+      "path": "overview.md"
+    }
+  },
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "tags": [
+    "Extension",
+    "Marketplace",
+    "Continuous Integration",
+    "Continuous Delivery",
+    "Build",
+    "Release",
+    "Azure Pipelines",
+    "Azure DevOps Extensions",
+    "Visual Studio Extensions"
+  ],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "notion-release-notes-qa",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "NotionReleaseNotes"
+      },
+      "iconAsset": "notion-release-notes-qa.notion-release-notes-qa/notion-azdo-icon.png",
+      "_sharedData": {
+        "assets": [
+          "notion-release-notes-qa.notion-release-notes-qa/notion-azdo-icon.png"
+        ]
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "NotionReleaseNotes/node_modules/vss-web-extension-sdk/lib",
+      "addressable": true,
+      "packagePath": "lib"
+    },
+    {
+      "path": "NotionReleaseNotes"
+    },
+    {
+      "path": "notion-release-notes.png"
+    },
+    {
+      "path": "notion-azdo-icon.png",
+      "addressable": true
+    }
+  ],
+  "scopes": [
+    "vso.build_execute",
+    "vso.serviceendpoint_manage"
+  ]
 }
