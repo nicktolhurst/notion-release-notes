@@ -4,25 +4,43 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  VERSIONED_TAG: "12.x"
+
 jobs:
   update-version:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.GH_PAT }}
+      if: contains(github.event.pull_request.labels.*.name, ${{ env.VERSIONED_TAG }})
+        - uses: actions/checkout@v2
+          with:
+            ref: ${{ github.head_ref }}
+            token: ${{ secrets.GH_PAT }}
 
-      - name: Update Build Version
-        run: |
-          ./update-version.ps1 -SemanticReleaseType "Build"
-        shell: pwsh  
+        - id: update-version
+          name: Update Build Version
+          run: |
+            $version = ./update-version.ps1 -SemanticReleaseType "Build"
+            Write-Output "::set-output name=${{ env.VERSIONED_TAG }}::${version}"
+          shell: pwsh  
 
-      - name: Git Auto Commit
-        uses: stefanzweifel/git-auto-commit-action@v4.12.0
-        with:
-          commit_message: "apply version updates for PR #${{ github.event.number }}"
-          branch: ${{ github.head_ref }}
-          commit_options: --no-verify
-          file_pattern: .
+        - name: Git Auto Commit
+          uses: stefanzweifel/git-auto-commit-action@v4.12.0
+          with:
+            commit_message: "apply version updates for PR #${{ github.event.number }}"
+            branch: ${{ github.head_ref }}
+            commit_options: --no-verify
+            file_pattern: .
+
+        - name: Set Version Label
+          uses: actions-ecosystem/action-add-labels@v1
+          if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
+          with:
+            labels: ${{ steps.update-version.outputs.version }}
+
+        - name: Set Versioned Label
+          uses: actions-ecosystem/action-add-labels@v1
+          if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
+          with:
+            labels: ${{ env.VERSIONED_TAG }}
