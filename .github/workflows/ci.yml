@@ -5,45 +5,50 @@ on:
     branches: [ main ]
 
 jobs:
-  update-version:
-    if: ${{ github.actor != 'rustyferret' }}
-    runs-on: ubuntu-latest
-    steps:
-      # Actual commits get version updates and committed before CI runs.
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.PAT_RUSTY }}
+  # update-version:
+  #   if: ${{ github.actor != 'rustyferret' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # Actual commits get version updates and committed before CI runs.
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         ref: ${{ github.head_ref }}
+  #         token: ${{ secrets.PAT_RUSTY }}
 
-      - id: update-version
-        name: Update Build Version
-        run: |
-          $version = ./update-version.ps1 -SemanticReleaseType "Build"
-          Write-Output "::set-output name=version::${version}"
-        shell: pwsh  
+  #     - id: update-version
+  #       name: Update Build Version
+  #       run: |
+  #         $version = ./update-version.ps1 -SemanticReleaseType "Build"
+  #         Write-Output "::set-output name=version::${version}"
+  #       shell: pwsh  
 
-      - name: Git Auto Commit
-        uses: stefanzweifel/git-auto-commit-action@v4.12.0
-        with:
-          commit_message: "CI_UPDATE_VERSION - PR #${{ github.event.number }} - ${{ steps.update-version.outputs.version }}"
-          branch: ${{ github.head_ref }}
-          commit_options: --no-verify
-          file_pattern: .
-          commit_user_name: rustyferret
-          commit_user_email: rustyferret26@outlook.com
+  #     - name: Git Auto Commit
+  #       uses: stefanzweifel/git-auto-commit-action@v4.12.0
+  #       with:
+  #         commit_message: "updates version for PR #${{ github.event.number }} to ${{ steps.update-version.outputs.version }}"
+  #         branch: ${{ github.head_ref }}
+  #         commit_options: --no-verify
+  #         file_pattern: .
+  #         commit_user_name: Rusty (Bot)
       
-      - name: Set Version Label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: ${{ steps.update-version.outputs.version }}
-
+  #     - name: Set Version Label
+  #       uses: actions-ecosystem/action-add-labels@v1
+  #       with:
+  #         labels: ${{ steps.update-version.outputs.version }}
 
   build:
-    if: ${{ github.actor == 'rustyferret' }} 
+    if: ${{ github.actor != 'rustyferret' }} 
     runs-on: ubuntu-latest
     steps:
       # Once the version commit is in, continue running CI.
       - uses: actions/checkout@v2
+
+      - id: update-version
+        name: Update Build Version
+        run: |
+          $version = ./update-version.ps1 -SetPatch ${{ env.GITHUB_RUN_ID }}
+          Write-Output "::set-output name=version::${version}"
+        shell: pwsh  
 
       - name: Setup Node
         uses: actions/setup-node@v1

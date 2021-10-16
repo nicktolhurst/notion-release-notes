@@ -1,7 +1,9 @@
 Param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$false)]
     [ValidateSet("Major","Minor","Build")]
-    $SemanticReleaseType
+    [string]$SemanticReleaseType,
+    [Parameter(Mandatory=$false)]
+    [int]$SetPatch
 )
 
 $version = Get-Content "version.json" | ConvertFrom-Json 
@@ -11,17 +13,28 @@ $manifest = Get-content "${PSScriptRoot}\vss-extension.json" | ConvertFrom-Json
 $testManifest = Get-content "${PSScriptRoot}\vss-extension.test.json" | ConvertFrom-Json
 
 $newVersion = [version]($version.version)
-$newVersion.GetType().GetField("_${SemanticReleaseType}", 'static,nonpublic,instance').SetValue($newVersion, ($newVersion.${SemanticReleaseType} + 1))
 
-if($SemanticReleaseType -eq "Minor")
+
+if($SemanticReleaseType)
 {
-    $newVersion.GetType().GetField("_Build", 'static,nonpublic,instance').SetValue($newVersion, 0)
+    $newVersion.GetType().GetField("_${SemanticReleaseType}", 'static,nonpublic,instance').SetValue($newVersion, ($newVersion.${SemanticReleaseType} + 1))  
+
+    if($SemanticReleaseType -eq "Minor")
+    {
+        $newVersion.GetType().GetField("_Build", 'static,nonpublic,instance').SetValue($newVersion, 0)
+    }
+    if($SemanticReleaseType -eq "Major")
+    {
+        $newVersion.GetType().GetField("_Minor", 'static,nonpublic,instance').SetValue($newVersion, 0)
+        $newVersion.GetType().GetField("_Build", 'static,nonpublic,instance').SetValue($newVersion, 0)
+    }
 }
-if($SemanticReleaseType -eq "Major")
+
+if($SetPatch)
 {
-    $newVersion.GetType().GetField("_Minor", 'static,nonpublic,instance').SetValue($newVersion, 0)
-    $newVersion.GetType().GetField("_Build", 'static,nonpublic,instance').SetValue($newVersion, 0)
+    $newVersion.GetType().GetField("_Build", 'static,nonpublic,instance').SetValue($newVersion, $SetPatch)
 }
+
 $newVersionString =  "{0}.{1}.{2}" -f $newVersion.Major, $newVersion.Minor, $newVersion.Build
 
 $task.version.Major = $newVersion.Major
