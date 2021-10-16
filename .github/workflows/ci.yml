@@ -46,6 +46,7 @@ jobs:
       - id: update-version
         name: Update Build Version
         run: |
+          Write-Output ${{ env.GITHUB_RUN_ID }}
           $version = ./update-version.ps1 -SetPatch ${{ env.GITHUB_RUN_ID }}
           Write-Output "::set-output name=version::${version}"
         shell: pwsh  
