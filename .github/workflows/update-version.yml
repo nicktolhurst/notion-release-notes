@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
-          # token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.PAT_RUSTY }}
 
       - id: update-version
         name: Update Build Version
