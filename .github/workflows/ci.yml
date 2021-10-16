@@ -6,7 +6,7 @@ on:
 
 jobs:
   update-version:
-    if: ${{ github.actor != rustyferret }}
+    if: ${{ github.actor != 'rustyferret' }}
     runs-on: ubuntu-latest
     steps:
       # Actual commits get version updates and committed before CI runs.
@@ -39,7 +39,7 @@ jobs:
 
 
   build:
-    if: ${{ github.actor == rustyferret && container(github.event.head_commit.message, 'CI_UPDATE_VERSION') }} 
+    if: ${{ github.actor == 'rustyferret' && container(github.event.head_commit.message, 'CI_UPDATE_VERSION') }} 
     runs-on: ubuntu-latest
     steps:
       # Once the version commit is in, continue running CI.
