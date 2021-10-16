@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # update-version:
+  #   if: ${{ github.actor != 'rustyferret' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # Actual commits get version updates and committed before CI runs.
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         ref: ${{ github.head_ref }}
+  #         token: ${{ secrets.PAT_RUSTY }}
+
+  #     - id: update-version
+  #       name: Update Build Version
+  #       run: |
+  #         $version = ./update-version.ps1 -SemanticReleaseType "Build"
+  #         Write-Output "::set-output name=version::${version}"
+  #       shell: pwsh  
+
+  #     - name: Git Auto Commit
+  #       uses: stefanzweifel/git-auto-commit-action@v4.12.0
+  #       with:
+  #         commit_message: "updates version for PR #${{ github.event.number }} to ${{ steps.update-version.outputs.version }}"
+  #         branch: ${{ github.head_ref }}
+  #         commit_options: --no-verify
+  #         file_pattern: .
+  #         commit_user_name: Rusty (Bot)
+      
+  #     - name: Set Version Label
+  #       uses: actions-ecosystem/action-add-labels@v1
+  #       with:
+  #         labels: ${{ steps.update-version.outputs.version }}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Once the version commit is in, continue running CI.
+      - uses: actions/checkout@v2
+
+      - id: update-version
+        name: Update Build Version
+        run: |
+          Write-Output $env:GITHUB_RUN_ID
+          $version = ./update-version.ps1 -SetPatch $env:GITHUB_RUN_ID
+          Write-Output "::set-output name=version::${version}"
+        shell: pwsh  
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+    
+      - name: NPM install with caching
+        uses: bahmutov/npm-install@v1.6.0
+        with:
+          working-directory: ./NotionReleaseNotes/
+
+      - name: Compile Typescript
+        run: |
+          tsc -p ./NotionReleaseNotes/tsconfig.json
+
+      - name: TfxInstaller
+        uses: Maetis/github-action-tfxinstaller@v1.0.0-pre
+
+      - name: Publish Task
+        env:
+          AZURE_DEVOPS_EXT_PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }} 
+        run: |
+          tfx extension create --manifest-globs vss-extension.test.json
+          tfx extension publish --manifest-globs vss-extension.test.json --share-with nictolhurst --token ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Trigger Task Run
+        env:
+          AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
+          VERSION: ${{ steps.update-version.outputs.version }}
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: |
+            /usr/bin/pwsh ./ado-test.ps1 -Version $env:VERSION
+            
+      - uses: mshick/add-pr-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_RUSTY }}
+        with:
+          message: |
+            A test for your commit been triggered over at [Azure DevOps](https://nictolhurst.visualstudio.com/Awesome%20Project/_git/Awesome%20Project/pullrequest/29)
+            
+            When the task has compelted, your release notes will be available for review at [Notion Release Notes Tests](https://ethereal-coreopsis-b86.notion.site/3c0cf7a718e8404faa837870b25a2eef?v=28249579058948718b4ce06434256f82)
+          allow-repeats: true
