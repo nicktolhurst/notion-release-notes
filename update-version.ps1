@@ -39,3 +39,5 @@ Set-Content -Path "${PSScriptRoot}\vss-extension.test.json" -Value ($testManifes
 Set-Content -Path "${PSScriptRoot}\version.json" -Value ($version | ConvertTo-Json -Depth 10.)
 
 Write-Output "New Version: ${version}"
+
+return $version.version

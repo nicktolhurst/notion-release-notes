@@ -16,13 +16,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.GH_PAT }}
+          # token: ${{ secrets.GH_PAT }}
 
       - id: update-version
         name: Update Build Version
         run: |
           $version = ./update-version.ps1 -SemanticReleaseType "Build"
           Write-Output "::set-output name=${{ env.VERSIONED_TAG }}::${version}"
+          Write-Output ${{ github.actor }}
         shell: pwsh  
 
       - name: Git Auto Commit
@@ -35,12 +36,10 @@ jobs:
 
       - name: Set Version Label
         uses: actions-ecosystem/action-add-labels@v1
-        if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
         with:
           labels: ${{ steps.update-version.outputs.version }}
 
       - name: Set Versioned Label
         uses: actions-ecosystem/action-add-labels@v1
-        if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
         with:
           labels: ${{ env.VERSIONED_TAG }}
