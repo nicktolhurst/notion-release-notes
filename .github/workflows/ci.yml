@@ -80,11 +80,9 @@ jobs:
             
       - uses: mshick/add-pr-comment@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_RUSTY }}
         with:
           message: |
-            Hi @${{ github.actor }},
-          
             A test for your commit been triggered over at [Azure DevOps](https://nictolhurst.visualstudio.com/Awesome%20Project/_git/Awesome%20Project/pullrequest/29)
             
             When the task has compelted, your release notes will be available for review at [Notion Release Notes Tests](https://ethereal-coreopsis-b86.notion.site/3c0cf7a718e8404faa837870b25a2eef?v=28249579058948718b4ce06434256f82)
