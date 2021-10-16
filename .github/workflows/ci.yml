@@ -37,7 +37,6 @@ jobs:
   #         labels: ${{ steps.update-version.outputs.version }}
 
   build:
-    if: ${{ github.actor != 'rustyferret' }} 
     runs-on: ubuntu-latest
     steps:
       # Once the version commit is in, continue running CI.
@@ -78,11 +77,11 @@ jobs:
       - name: Trigger Task Run
         env:
           AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
+          VERSION: ${{ steps.update-version.outputs.version }}
         uses: Azure/cli@1.0.4
         with:
           inlineScript: |
-            az config set extension.use_dynamic_install=yes_without_prompt
-            az repos pr policy queue --evaluation-id 96e348ff-825d-4e85-acc5-edfd29f76776 --id 28 --org https://dev.azure.com/nictolhurst/
+            ./ado-test.ps1 -Version $env:VERSION
             
       - uses: mshick/add-pr-comment@v1
         env:

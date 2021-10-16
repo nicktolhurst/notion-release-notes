@@ -62,7 +62,7 @@ async function mapToReleaseNotesDomainModeil(adoResponseObjectCollection: AdoRes
                         name: adoResponseObjectCollection.gitPullRequest.repository?.project?.name,
                         url: adoResponseObjectCollection.gitPullRequest.repository?.project?.url
                     },
-                    buildId: adoResponseObjectCollection.webApiTagDefinitions.find(tag => tag.name?.toLowerCase().startsWith("version:"))?.name?.toLowerCase().split("version: ")[1]
+                    buildId: adoResponseObjectCollection.webApiTagDefinitions.find(tag => tag.name?.toLowerCase().startsWith("version:"))?.name?.toLowerCase().split("version: ")[1] ?? "No Version!"
                 },
                 pullRequest: {
                     branchName: {

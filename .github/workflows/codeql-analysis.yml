@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    - cron: '17 12 * * 6'
+    - cron: '0 2 * * *' # “At 02:00.” - https://crontab.guru/every-day-at-2am
 
 jobs:
   analyze:
