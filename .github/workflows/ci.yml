@@ -11,7 +11,6 @@ jobs:
     steps:
       # Actual commits get version updates and committed before CI runs.
       - uses: actions/checkout@v2
-        
         with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.PAT_RUSTY }}
@@ -21,7 +20,6 @@ jobs:
         run: |
           $version = ./update-version.ps1 -SemanticReleaseType "Build"
           Write-Output "::set-output name=version::${version}"
-          Write-Output ${{ github.actor }}
         shell: pwsh  
 
       - name: Git Auto Commit
@@ -31,6 +29,8 @@ jobs:
           branch: ${{ github.head_ref }}
           commit_options: --no-verify
           file_pattern: .
+          commit_user_name: rustyferret
+          commit_user_email: rustyferret26@outlook.com
       
       - name: Set Version Label
         uses: actions-ecosystem/action-add-labels@v1
@@ -39,7 +39,7 @@ jobs:
 
 
   build:
-    if: ${{ github.actor == 'rustyferret' && contains(github.event.head_commit.message, 'CI_UPDATE_VERSION') }} 
+    if: ${{ github.actor == 'rustyferret' }} 
     runs-on: ubuntu-latest
     steps:
       # Once the version commit is in, continue running CI.
