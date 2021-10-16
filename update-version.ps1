@@ -5,7 +5,6 @@ Param(
 )
 
 $version = Get-Content "version.json" | ConvertFrom-Json 
-Write-Output "Old Version: ${version}"
 
 $task = Get-content "${PSScriptRoot}\NotionReleaseNotes\task.json" | ConvertFrom-Json
 $manifest = Get-content "${PSScriptRoot}\vss-extension.json" | ConvertFrom-Json
@@ -37,7 +36,5 @@ Set-Content -Path "${PSScriptRoot}\NotionReleaseNotes\task.json"  -Value ($task 
 Set-Content -Path "${PSScriptRoot}\vss-extension.json" -Value ($manifest | ConvertTo-Json -Depth 10) 
 Set-Content -Path "${PSScriptRoot}\vss-extension.test.json" -Value ($testManifest | ConvertTo-Json -Depth 10) 
 Set-Content -Path "${PSScriptRoot}\version.json" -Value ($version | ConvertTo-Json -Depth 10.)
-
-Write-Output "New Version: ${version}"
 
 return $version.version
