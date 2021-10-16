@@ -7,10 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    # Actual commits get version updates and committed before CI runs.
-    if: ${{ github.actor != rustyferret }}
-      steps:
+    steps:
+      # Actual commits get version updates and committed before CI runs.
+      if: ${{ github.actor != rustyferret }}
         - uses: actions/checkout@v2
           with:
             ref: ${{ github.head_ref }}
@@ -37,9 +36,8 @@ jobs:
           with:
             labels: ${{ steps.update-version.outputs.version }}
 
-    # Once the version commit is in, continue running CI.
-    if: ${{ github.actor == rustyferret && container(github.event.head_commit.message, 'CI_UPDATE_VERSION') }}   
-      steps:
+      # Once the version commit is in, continue running CI.
+      if: ${{ github.actor == rustyferret && container(github.event.head_commit.message, 'CI_UPDATE_VERSION') }}   
         - uses: actions/checkout@v2
 
         - name: Setup Node
